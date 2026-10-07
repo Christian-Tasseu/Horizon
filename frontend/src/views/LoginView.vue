@@ -24,7 +24,7 @@
         errorMessage.value = ''
         try {
             await auth.login(email.value, password.value)
-            router.push('/dashboard');
+            router.push('/habitsView');
         } catch (error) {
             errorMessage.value = error?.response?.data?.error || "Erreur interne du serveur";
         }
