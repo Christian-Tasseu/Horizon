@@ -20,6 +20,12 @@ export const habitService = {
         if(habit.user_id !== userId) throw new Error("Habitude introuvable");
         await habitLogRepository.upsertLog({ habitId, logDate, completed, note });
     },
+    async removeLog({ habitId, logId, userId }) {
+        const habit = await habitRepository.findById(habitId);
+        if (!habit) throw new Error("Habitude introuvable");
+        if (habit.user_id !== userId) throw new Error("Habitude introuvable");
+        await habitLogRepository.removeLog({ habitId, logId });
+    },
     async getLogs({ habitId, userId }) {
         const habit = await habitRepository.findById(habitId);
         if (!habit) throw new Error("Habitude introuvable");

@@ -41,6 +41,16 @@ export const habitController = {
             res.status(404).json({ error: error.message});
         }
     },
+    async removeLog(req, res) {
+        const userId = req.userId;
+        const { habitId, logId } = req.params;
+        try {
+            await habitService.removeLog({ habitId, logId, userId });
+            res.status(204).send();
+        } catch (error) {
+            res.status(404).json({ error: error.message });
+        }
+    },
     async getLogs(req, res) {
         const userId = req.userId;
         const { habitId } = req.params;

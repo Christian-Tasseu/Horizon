@@ -9,6 +9,7 @@ router.get("/", authMiddleware, habitController.list);
 router.post("/", authMiddleware, habitController.create);
 router.patch("/:id", authMiddleware, habitController.archive);
 router.post("/:habitId/logs", authMiddleware, habitController.logHabit);
+router.delete("/:habitId/logs/:logId", authMiddleware, habitController.removeLog);
 router.get("/:habitId/logs", authMiddleware, habitController.getLogs);
 
 export default router;

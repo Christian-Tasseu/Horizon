@@ -9,6 +9,12 @@ export const habitLogRepository = {
       [habitId, logDate, completed, note],
     );
   },
+  async removeLog({ habitId, logId }) {
+    await db.query(
+      "DELETE FROM habit_logs WHERE id = ? AND habit_id = ?",
+      [logId, habitId],
+    );
+  },
   async findByHabit(habitId) {
     const [habitLogs] = await db.query("SELECT * FROM habit_logs WHERE habit_id = ? ORDER BY log_date ASC", [habitId]);
     return habitLogs;
