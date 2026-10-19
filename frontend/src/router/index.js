@@ -2,6 +2,7 @@ import {createRouter, createWebHistory} from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import HabitsView from '../views/HabitsView.vue'
 import { useAuthStore } from '../stores/auth.store.js';
+import JournalView from '../views/JournalView.vue'
 
 const router = createRouter({
     history: createWebHistory(),
@@ -19,6 +20,12 @@ const router = createRouter({
             path: '/habitsView',
             name: 'habitsView',
             component: HabitsView,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/journal',
+            name: 'journal',
+            component: JournalView,
             meta: { requiresAuth: true }
         }
     ]
