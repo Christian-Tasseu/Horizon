@@ -4,6 +4,7 @@ import { env } from "./config/env.js";
 import authRoutes from "./routes/auth.route.js";
 import habitRoutes from "./routes/habit.route.js";
 import journalRoutes from "./routes/journal.route.js";
+import chatRoutes from "./routes/chat.route.js";
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(cors());
 app.use("/api/auth", authRoutes);
 app.use("/api/habits", habitRoutes);
 app.use("/api/journal", journalRoutes);
+app.use("/api/chat", chatRoutes);
 
 app.get("/", (req, res) => {
     res.send("Bonjour !");

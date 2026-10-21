@@ -1,3 +1,6 @@
+import { journalService } from "../services/journal.service.js";
+import { llmService } from "../services/llm.service.js";
+
 export const ragService = {
   buildPrompt(question, entries) {
     const newEntries = entries
@@ -16,5 +19,18 @@ Extraits du journal :
 ${newEntries}
 
 Question : ${question}`;
+  },
+
+  async answer({ userId, question }) {
+    const entries = await journalService.search({ userId, query: question });
+    if (entries.length === 0) {
+      return {
+        answer: "Je ne trouve rien dans ton journal qui réponde à cette question.",
+        sources: [],
+      };
+    }
+    const prompt = ragService.buildPrompt(question, entries);
+    const answer = await llmService.generate(prompt);
+    return { answer, sources: entries };
   },
 };
