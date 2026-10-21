@@ -18,5 +18,14 @@ export const journalRepository = {
 
     async updateJournal({id, content}) {
         await db.query("UPDATE journal_entries SET content = ? WHERE id = ?", [content, id])
+    },
+
+    async saveEmbedding({ id, embedding}) {
+        await db.query("UPDATE journal_entries SET embedding = ? WHERE id = ?", [JSON.stringify(embedding), id])
+    },
+
+    async findAllWithoutEmbedding() {
+        const [result] = await db.query("SELECT id, content FROM journal_entries WHERE embedding IS NULL")
+        return result || [];
     }
-};
+}

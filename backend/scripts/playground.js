@@ -1,4 +1,5 @@
 import { pipeline } from "@huggingface/transformers";
+import { embeddingService } from "../src//services/embedding.service.js"
 
 const extractor = await pipeline(
   "feature-extraction",
@@ -6,8 +7,8 @@ const extractor = await pipeline(
 );
 
 const embed = async (text) => {
-    const output = await extractor(text, { pooling: "mean", normalize: true });
-    return Array.from(output.data);
+  const output = await extractor(text, { pooling: "mean", normalize: true });
+  return Array.from(output.data);
 };
 
 const distance = (vecA, vecB) => {
@@ -33,38 +34,11 @@ const vecQuestion = await embed(question);
 const results = [];
 
 for (const text of entries) {
-    const vecText = await embed(text)
-    results.push({ text, 'distance': distance(vecQuestion, vecText)})
+  const vecText = await embeddingService.embed(text);
+  results.push({ text, distance: distance(vecQuestion, vecText) });
 }
 
 results.sort((a, b) => a.distance - b.distance);
-console.table(results)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // const text1 = "J'ai fait une séance de sport ce matin"
 // const text2 = "Entraînement de musculation ce matin"
