@@ -1,5 +1,6 @@
 import { pipeline } from "@huggingface/transformers";
-import { embeddingService } from "../src//services/embedding.service.js"
+import { embeddingService } from "../src//services/embedding.service.js";
+import { ragService } from "../src/services/rag.service.js";
 
 const extractor = await pipeline(
   "feature-extraction",
@@ -27,18 +28,25 @@ const entries = [
   "Réunion avec mon équipe, la journée était longue",
 ];
 
-const question = "Comment je dors en ce moment ?";
+console.log(
+  ragService.buildPrompt("Question test ? ", {
+    content: "Un test aléatoire",
+    created_at: "2026-10-18T22:44:32.000Z",
+  }),
+);
 
-const vecQuestion = await embed(question);
+// const question = "Comment je dors en ce moment ?";
 
-const results = [];
+// const vecQuestion = await embed(question);
 
-for (const text of entries) {
-  const vecText = await embeddingService.embed(text);
-  results.push({ text, distance: distance(vecQuestion, vecText) });
-}
+// const results = [];
 
-results.sort((a, b) => a.distance - b.distance);
+// for (const text of entries) {
+//   const vecText = await embeddingService.embed(text);
+//   results.push({ text, distance: distance(vecQuestion, vecText) });
+// }
+
+// results.sort((a, b) => a.distance - b.distance);
 
 // const text1 = "J'ai fait une séance de sport ce matin"
 // const text2 = "Entraînement de musculation ce matin"
