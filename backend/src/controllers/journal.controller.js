@@ -43,5 +43,21 @@ export const journalController = {
     } catch (error) {
       res.status(error.status || 500).json({ error: error.message})
     }
+  },
+
+  async search(req, res) {
+    const userId = req.userId;
+    const query = req.query.q;
+
+    if (typeof query !== "string" || !query?.trim()) {
+      return res.status(400).json({ error: "Le contenu est requis" });
+    }
+
+    try {
+      const entries = await journalService.search({ userId, query })
+      res.status(200).json(entries)
+    } catch (error) {
+      res.status(500).json({ error: error.message})
+    }
   }
 };

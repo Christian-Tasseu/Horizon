@@ -7,5 +7,6 @@ const router = Router();
 router.post("/", authMiddleware, journalController.createJournal)
 router.get("/", authMiddleware, journalController.list)
 router.patch("/:id", authMiddleware, journalController.updateJournal)
+router.get("/search", authMiddleware, journalController.search)
 
 export default router; 

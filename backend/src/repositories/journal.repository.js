@@ -27,5 +27,10 @@ export const journalRepository = {
     async findAllWithoutEmbedding() {
         const [result] = await db.query("SELECT id, content FROM journal_entries WHERE embedding IS NULL")
         return result || [];
+    },
+
+    async findAllWithEmbedding({ userId }) {
+        const [result] = await db.query("SELECT id, content, created_at, embedding FROM journal_entries WHERE user_id = ? AND embedding IS NOT NULL", [ userId ]);
+        return result || [];
     }
 }
