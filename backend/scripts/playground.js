@@ -1,6 +1,7 @@
 import { pipeline } from "@huggingface/transformers";
 import { embeddingService } from "../src//services/embedding.service.js";
 import { ragService } from "../src/services/rag.service.js";
+import { llmService } from "../src/services/llm.service.js";
 
 const extractor = await pipeline(
   "feature-extraction",
@@ -28,13 +29,17 @@ const entries = [
   "Réunion avec mon équipe, la journée était longue",
 ];
 
-console.log(
-  ragService.buildPrompt("Question test ? ", {
-    content: "Un test aléatoire",
-    created_at: "2026-10-18T22:44:32.000Z",
-  }),
-);
-
+const res = await llmService.generate(ragService.buildPrompt("Comment je dors en ce moment ?", [
+    {
+      content: "Aujourd'hui j'ai fait une séance de sport ce matin",
+      created_at: "2026-10-19T10:30:00.000Z",
+    },
+    {
+      content: "Je me suis réveillé trois fois cette nuit, je suis épuisé",
+      created_at: "2026-10-20T15:45:00.000Z",
+    },
+  ]))
+console.log(res)
 // const question = "Comment je dors en ce moment ?";
 
 // const vecQuestion = await embed(question);
