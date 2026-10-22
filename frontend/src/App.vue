@@ -3,6 +3,7 @@
     <nav>
       <RouterLink to="/habitsView">Habitudes</RouterLink>
       <RouterLink to="/journal">Journal</RouterLink>
+      <RouterLink to="/chat">Chat</RouterLink>
     </nav>
     <button type="button" @click="handleLogout">Déconnexion</button>
   </header>
