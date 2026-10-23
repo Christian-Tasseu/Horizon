@@ -1,19 +1,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap');
 
 :root {
-  --color-bg: #EDEFF2;
-  --color-ink: #1B2430;
-  --color-ink-soft: #5B6472;
+  --color-bg: #edf3f8;
+  --color-ink: #19324a;
+  --color-ink-soft: #607487;
   --color-surface: #FFFFFF;
-  --color-border: #D7DAE0;
-  --color-accent: #1D9E75;
-  --color-accent-soft: #BEE0D4;
-  --color-danger: #B54B3A;
+  --color-border: #d6e0ea;
+  --color-accent: #3478a8;
+  --color-accent-soft: #c8ddec;
+  --color-danger: #955368;
 
   --font-heading: 'Fraunces', serif;
   --font-body: 'Inter', sans-serif;
 
   --radius: 10px;
+}
+
+:root.dark-mode {
+  --color-bg: #101b27;
+  --color-ink: #e3edf5;
+  --color-ink-soft: #a6b8c8;
+  --color-surface: #172636;
+  --color-border: #2c455b;
+  --color-accent: #74b4dc;
+  --color-accent-soft: #264b67;
+  --color-danger: #d38a9a;
 }
 
 * {
@@ -25,6 +36,154 @@ body {
   background: var(--color-bg);
   color: var(--color-ink);
   font-family: var(--font-body);
+}
+
+#app {
+  min-height: 100vh;
+}
+
+.dark-mode body {
+  background: var(--color-bg);
+}
+
+.dark-mode .nav {
+  border-bottom-color: rgba(116, 180, 220, 0.2);
+  background: transparent;
+}
+
+.dark-mode .brand,
+.dark-mode .nav-links a.router-link-active,
+.dark-mode .theme-button:hover {
+  color: #e3edf5;
+}
+
+.dark-mode .nav-links a {
+  color: #a6b8c8;
+}
+
+.dark-mode .nav-links a:hover {
+  color: #e3edf5;
+  background: rgba(116, 180, 220, 0.1);
+}
+
+.dark-mode .nav-links a.router-link-active {
+  border-bottom-color: transparent !important;
+  background: #264b67;
+  color: #e3edf5;
+}
+
+.dark-mode .theme-button,
+.dark-mode .logout-button {
+  border-color: rgba(166, 184, 200, 0.24);
+  background: transparent;
+  color: #a6b8c8;
+}
+
+.dark-mode .theme-button:hover,
+.dark-mode .logout-button:hover {
+  border-color: rgba(116, 180, 220, 0.42);
+  background: rgba(116, 180, 220, 0.12);
+  color: #e3edf5;
+}
+
+.dark-mode .brand-mark {
+  background: #74b4dc;
+  color: #102030;
+}
+
+.dark-mode .habits,
+.dark-mode .journal {
+  background:
+    radial-gradient(circle at 95% 3%, rgba(116, 180, 220, 0.12), transparent 20%),
+    linear-gradient(180deg, #142332 0%, #101b27 100%);
+}
+
+.dark-mode .create-section,
+.dark-mode .entry-form {
+  border-color: rgba(116, 180, 220, 0.22);
+  background: rgba(23, 38, 54, 0.84);
+}
+
+.dark-mode .habit-card,
+.dark-mode .entry-list li {
+  border-color: rgba(116, 180, 220, 0.2);
+  background: rgba(23, 38, 54, 0.94);
+  box-shadow: 0 12px 30px rgba(4, 12, 20, 0.2);
+}
+
+.dark-mode .habit-form input,
+.dark-mode .entry-form textarea,
+.dark-mode .edit-form textarea,
+.dark-mode .auth-form input {
+  border-color: #2c455b;
+  background: #122131;
+  color: #e3edf5;
+}
+
+.dark-mode .auth-page,
+.dark-mode .auth-panel {
+  background: #101b27;
+}
+
+.dark-mode .auth-intro {
+  background:
+    radial-gradient(circle at 15% 15%, rgba(116, 180, 220, 0.16), transparent 28%),
+    linear-gradient(145deg, #0c1825 0%, #183b55 52%, #245779 100%);
+}
+
+.dark-mode .auth-form input::placeholder {
+  color: #7890a5;
+}
+
+.dark-mode .page-header h1,
+.dark-mode .create-section h2,
+.dark-mode .habits-section h2,
+.dark-mode .habit-title h3,
+.dark-mode .journal h1,
+.dark-mode .entry-content,
+.dark-mode .auth-header h2,
+.dark-mode .auth-form label {
+  color: #e3edf5 !important;
+}
+
+.dark-mode .page-subtitle,
+.dark-mode .today-card,
+.dark-mode .today-card strong,
+.dark-mode .habit-form label,
+.dark-mode .habit-count,
+.dark-mode .habit-title p,
+.dark-mode .habit-state,
+.dark-mode .empty-state,
+.dark-mode .entry-list time,
+.dark-mode .empty,
+.dark-mode .form-intro,
+.dark-mode .auth-switch {
+  color: #b4c5d4 !important;
+}
+
+.dark-mode .eyebrow,
+.dark-mode .section-number,
+.dark-mode .color-picker strong,
+.dark-mode .link,
+.dark-mode .auth-switch button {
+  color: #8fc7eb !important;
+}
+
+.dark-mode .habit-form button,
+.dark-mode .complete-button,
+.dark-mode .entry-form button,
+.dark-mode .entry-actions button,
+.dark-mode .submit-button {
+  background: #4b91bf;
+  color: #f4f9fc;
+}
+
+.dark-mode .habit-form button:hover,
+.dark-mode .complete-button:hover,
+.dark-mode .entry-form button:hover,
+.dark-mode .entry-actions button:hover,
+.dark-mode .submit-button:hover {
+  background: #65a8d2;
 }
 
 h1, h2, h3 {

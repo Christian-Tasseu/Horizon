@@ -1,25 +1,30 @@
-import { defineStore } from "pinia";
-import { api } from "../services/api";
 import { ref } from "vue";
+import { defineStore } from "pinia";
+import { api } from "../services/api.js";
 
 export const useChatStore = defineStore("chat", () => {
   const messages = ref([]);
-  const loading = ref(false);
+  const isLoading = ref(false);
 
   const ask = async (question) => {
     messages.value.push({ role: "user", content: question });
-    loading.value = true;
+    isLoading.value = true;
     try {
       const { data } = await api.post("/chat/ask", { question });
       messages.value.push({
         role: "assistant",
         content: data.answer,
-        sources: data.sources,
+        sources: data.sources || [],
       });
+      return data;
     } finally {
-      loading.value = false;
+      isLoading.value = false;
     }
   };
 
-  return { messages, loading, ask };
+  const clear = () => {
+    messages.value = [];
+  };
+
+  return { messages, isLoading, ask, clear };
 });

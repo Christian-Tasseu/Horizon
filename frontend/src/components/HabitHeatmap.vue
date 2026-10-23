@@ -1,5 +1,5 @@
 <template>
-  <div class="heatmap">
+  <div class="heatmap" :style="{ '--heatmap-color': props.color }">
     <div
       v-for="day in days"
       :key="day.date"
@@ -15,7 +15,8 @@
     import { formatDate } from '../utils/date.js';
 
     const props =defineProps({
-        logs: {type: Array, default: () => []}
+      logs: {type: Array, default: () => []},
+      color: {type: String, default: '#1D9E75'}
     });
 
     const days = computed (() => {
@@ -50,6 +51,6 @@
 }
 
 .cell.done {
-  background: var(--color-accent);
+  background: var(--heatmap-color, var(--color-accent));
 }
 </style>

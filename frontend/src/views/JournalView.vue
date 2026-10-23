@@ -103,71 +103,107 @@ const handleUpdate = async () => {
 
 <style scoped>
 .journal {
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 40px 24px;
+  min-height: calc(100vh - 65px);
+  width: 100%;
+  padding: 56px clamp(24px, 6vw, 88px) 80px;
+  background:
+    radial-gradient(circle at 95% 3%, rgba(52, 120, 168, 0.14), transparent 20%),
+    linear-gradient(180deg, #f1f6fa 0%, #eaf1f6 100%);
 }
 
 .journal h1 {
-  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(52, 120, 168, 0.2);
+  color: #19324a;
+  font-size: clamp(44px, 7vw, 78px);
+  line-height: 0.95;
 }
 
 .entry-form {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 24px;
+  gap: 12px;
+  margin: 42px 0 34px;
+  padding: 26px 28px 28px;
+  border: 1px solid rgba(52, 120, 168, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.52);
 }
 
 .entry-form textarea {
-  padding: 12px;
-  border: 0.5px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-surface);
-  color: var(--color-ink);
+  min-height: 120px;
+  padding: 13px 14px;
+  border: 1px solid #d1dce6;
+  border-radius: 5px;
+  outline: none;
+  background: #fafdff;
+  color: #19324a;
+  line-height: 1.6;
   resize: vertical;
+}
+
+.entry-form textarea:focus,
+.edit-form textarea:focus {
+  border-color: #3478a8;
+  box-shadow: 0 0 0 3px rgba(52, 120, 168, 0.13);
 }
 
 .entry-form button {
   align-self: flex-end;
-  padding: 10px 16px;
+  padding: 14px 16px;
   border: none;
-  border-radius: var(--radius);
-  background: var(--color-accent);
-  color: #fff;
+  border-radius: 5px;
+  background: #3478a8;
+  color: #f5f9fc;
   cursor: pointer;
+  font-weight: 700;
+}
+
+.entry-form button:hover,
+.entry-actions button:hover {
+  background: #4e8fba;
 }
 
 .entry-list {
-  list-style: none;
-  padding: 0;
   margin: 0;
+  padding: 0;
+  list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .entry-list li {
-  background: var(--color-surface);
-  border: 0.5px solid var(--color-border);
-  border-radius: var(--radius);
-  padding: 16px;
+  padding: 22px;
+  border: 1px solid rgba(52, 120, 168, 0.18);
+  border-left: 3px solid #3478a8;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow: 0 12px 30px rgba(25, 50, 74, 0.06);
 }
 
 .entry-list time {
-  font-size: 12px;
-  color: var(--color-ink-soft);
+  color: #68746f;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .entry-content {
-  margin: 6px 0 0;
+  margin: 10px 0 0;
+  color: #19324a;
   font-family: var(--font-heading);
+  font-size: 20px;
   line-height: 1.6;
   white-space: pre-wrap;
 }
 
 .empty {
-  color: var(--color-ink-soft);
+  padding: 36px 0;
+  border-top: 1px solid rgba(52, 120, 168, 0.18);
+  color: #68746f;
+  font-family: var(--font-heading);
+  font-size: 22px;
 }
 
 .error {
@@ -183,11 +219,13 @@ const handleUpdate = async () => {
 }
 
 .edit-form textarea {
-  padding: 12px;
-  border: 0.5px solid var(--color-border);
-  border-radius: var(--radius);
-  background: var(--color-surface);
-  color: var(--color-ink);
+  min-height: 120px;
+  padding: 13px 14px;
+  border: 1px solid #d1dce6;
+  border-radius: 5px;
+  outline: none;
+  background: #fafdff;
+  color: #19324a;
   font-family: var(--font-heading);
   line-height: 1.6;
   resize: vertical;
@@ -200,18 +238,19 @@ const handleUpdate = async () => {
 }
 
 .entry-actions button {
-  padding: 8px 14px;
+  padding: 10px 13px;
   border: none;
-  border-radius: var(--radius);
-  background: var(--color-accent);
-  color: #fff;
+  border-radius: 5px;
+  background: #3478a8;
+  color: #f5f9fc;
   cursor: pointer;
+  font-weight: 700;
 }
 
 .entry-actions .secondary {
-  background: var(--color-surface);
-  color: var(--color-ink);
-  border: 0.5px solid var(--color-border);
+  background: transparent;
+  color: #68746f;
+  border: 1px solid #d1dce6;
 }
 
 .link {
@@ -225,6 +264,24 @@ const handleUpdate = async () => {
 }
 
 .link:hover {
-  color: var(--color-accent);
+  color: #3478a8;
+}
+
+@media (max-width: 480px) {
+  .journal {
+    padding: 36px 20px 56px;
+  }
+
+  .journal h1 {
+    font-size: 48px;
+  }
+
+  .entry-form {
+    padding: 22px 18px;
+  }
+
+  .entry-form button {
+    align-self: stretch;
+  }
 }
 </style>
