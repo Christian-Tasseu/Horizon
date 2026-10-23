@@ -12,3 +12,27 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const original = error.config;
+    if (
+      error.response?.status === 401 &&
+      !original._retry &&
+      original.url !== "/auth/login" &&
+      original.url !== "/auth/refresh"
+    ) {
+      original._retry = true;
+      const auth = useAuthStore();
+      try {
+        await auth.refresh();
+        return api(original);
+      } catch {
+        await auth.logout();
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  },
+);

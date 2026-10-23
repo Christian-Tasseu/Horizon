@@ -4,6 +4,7 @@ import { api } from "../services/api.js";
 
 export const useAuthStore = defineStore("auth", () => {
   const accessToken = ref(null);
+  let refreshPromise = null;
   const isLoggedIn = computed(() => accessToken.value !== null);
   const login = async (email, password) => {
     const { data } = await api.post("/auth/login", { email, password });
@@ -22,6 +23,22 @@ export const useAuthStore = defineStore("auth", () => {
       }
     }
   };
+  const doRefresh = async () => {
+    const refreshToken = localStorage.getItem("refreshToken");
+    if (refreshToken) {
+        const { data } = await api.post("/auth/refresh", { refreshToken });
+        accessToken.value = data.accessToken;
+        localStorage.setItem("refreshToken", data.refreshToken);
+    } else {
+      throw new Error("Erreur lors de la récupération du token d'actualisation");
+    }
+  };
+  const refresh = async () => {
+    if (refreshPromise === null) {
+      refreshPromise = doRefresh().finally(() => { refreshPromise = null; })
+    }
+    return refreshPromise;
+  }
   const logout = async () => {
     const refreshToken = localStorage.getItem("refreshToken");
 
@@ -36,5 +53,5 @@ export const useAuthStore = defineStore("auth", () => {
     localStorage.removeItem("refreshToken");
   };
 
-  return { accessToken, isLoggedIn, login, initialize, logout };
+  return { accessToken, isLoggedIn, login, initialize, logout, refresh };
 });
