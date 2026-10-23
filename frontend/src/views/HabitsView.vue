@@ -102,6 +102,7 @@
               type="button"
               class="complete-button"
               :class="{ completed: habit.isDone }"
+              :style="{ backgroundColor: habit.color || '#3478a8' }"
               @click="handleLog(habit.id)"
             >
               <span>{{ habit.isDone ? "Défaire" : "Marquer comme fait" }}</span>
