@@ -15,8 +15,24 @@ export const habitRepository = {
     );
     return habit.insertId;
   },
+  async update({ id, name, description, color }) {
+    await db.query(
+      "UPDATE habits SET name = ?, description = ?, color = ? WHERE id = ?",
+      [name, description, color, id],
+    );
+  },
   async archive(id) {
     await db.query("UPDATE habits SET archived_at = NOW () WHERE id = ?", [id]);
+  },
+  async findArchivedByUser(userId) {
+    const [listArchived] = await db.query(
+      "SELECT * FROM habits WHERE user_id = ? AND archived_at IS NOT NULL",
+      [userId],
+    );
+    return listArchived;
+  },
+  async restore(id) {
+    await db.query("UPDATE habits SET archived_at = NULL WHERE id = ?", [id]);
   },
   async findById(id) {
     const [habit] = await db.query("SELECT * FROM habits WHERE id = ?", [id]);
