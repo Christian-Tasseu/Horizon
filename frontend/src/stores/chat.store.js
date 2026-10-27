@@ -22,9 +22,24 @@ export const useChatStore = defineStore("chat", () => {
     }
   };
 
+  const summarizeWeek = async () => {
+    isLoading.value = true;
+    try {
+      const { data } = await api.post("/chat/weekly-summary");
+      messages.value.push({
+        role: "assistant",
+        content: data.answer,
+        sources: data.sources || [],
+      });
+      return data;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   const clear = () => {
     messages.value = [];
   };
 
-  return { messages, isLoading, ask, clear };
+  return { messages, isLoading, ask, clear, summarizeWeek };
 });

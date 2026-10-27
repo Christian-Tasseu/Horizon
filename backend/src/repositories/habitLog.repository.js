@@ -10,13 +10,22 @@ export const habitLogRepository = {
     );
   },
   async removeLog({ habitId, logId }) {
-    await db.query(
-      "DELETE FROM habit_logs WHERE id = ? AND habit_id = ?",
-      [logId, habitId],
-    );
+    await db.query("DELETE FROM habit_logs WHERE id = ? AND habit_id = ?", [
+      logId,
+      habitId,
+    ]);
   },
   async findByHabit(habitId) {
-    const [habitLogs] = await db.query("SELECT * FROM habit_logs WHERE habit_id = ? ORDER BY log_date ASC", [habitId]);
+    const [habitLogs] = await db.query(
+      "SELECT * FROM habit_logs WHERE habit_id = ? ORDER BY log_date ASC",
+      [habitId],
+    );
     return habitLogs;
-  }
+  },
+  async findCompletedSince({ userId, since }) {
+    const [habitCompleted] = await db.query(
+      "SELECT hl.habit_id, hl.log_date FROM habit_logs hl JOIN habits h ON h.id = hl.habit_id WHERE h.user_id = ? AND h.archived_at IS NULL AND hl.completed = 1 AND hl.log_date >= ?",
+    [userId, since]);
+    return habitCompleted;
+  },
 };

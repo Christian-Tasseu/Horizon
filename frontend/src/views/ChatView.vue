@@ -10,32 +10,51 @@
             notes.
           </p>
         </div>
-        <button
-          v-if="chat.messages.length"
-          class="clear-button"
-          type="button"
-          @click="chat.clear"
-        >
-          Nouvelle conversation
-        </button>
+        <div class="chat-header-actions">
+          <button
+            class="summary-button"
+            type="button"
+            :disabled="chat.isLoading"
+            @click="handleSummary"
+          >
+            Résumé de la semaine
+          </button>
+          <button
+            v-if="chat.messages.length"
+            class="clear-button"
+            type="button"
+            @click="chat.clear"
+          >
+            Nouvelle conversation
+          </button>
+        </div>
       </header>
 
       <div v-if="!chat.messages.length" class="empty-chat">
-        <div class="empty-icon" aria-hidden="true">✦</div>
-        <h2>Que veux-tu comprendre aujourd'hui ?</h2>
-        <p>
-          Je m'appuie uniquement sur les entrées de ton journal pour répondre.
-        </p>
-        <div class="suggestions">
-          <button
-            v-for="suggestion in suggestions"
-            :key="suggestion"
-            type="button"
-            @click="useSuggestion(suggestion)"
-          >
-            {{ suggestion }}
-          </button>
-        </div>
+        <template v-if="chat.isLoading">
+          <div class="empty-icon loading-icon" aria-hidden="true">✦</div>
+          <h2>Je prépare ton bilan...</h2>
+          <span class="typing-dots" aria-label="Horizon prépare le bilan">
+            <i></i><i></i><i></i>
+          </span>
+        </template>
+        <template v-else>
+          <div class="empty-icon" aria-hidden="true">✦</div>
+          <h2>Que veux-tu comprendre aujourd'hui ?</h2>
+          <p>
+            Je m'appuie uniquement sur les entrées de ton journal pour répondre.
+          </p>
+          <div class="suggestions">
+            <button
+              v-for="suggestion in suggestions"
+              :key="suggestion"
+              type="button"
+              @click="useSuggestion(suggestion)"
+            >
+              {{ suggestion }}
+            </button>
+          </div>
+        </template>
       </div>
 
       <div v-else ref="messageList" class="message-list" aria-live="polite">
@@ -52,7 +71,11 @@
           <details v-if="message.sources?.length" class="sources">
             <summary class="source-count">
               {{ message.sources.length }}
-              {{ message.sources.length > 1 ? "extraits utilisés" : "extrait utilisé" }}
+              {{
+                message.sources.length > 1
+                  ? "extraits utilisés"
+                  : "extrait utilisé"
+              }}
             </summary>
             <ul class="source-list">
               <li v-for="source in message.sources" :key="source.id">
@@ -62,7 +85,10 @@
             </ul>
           </details>
         </article>
-        <div v-if="chat.isLoading" class="message message--assistant loading-message">
+        <div
+          v-if="chat.isLoading"
+          class="message message--assistant loading-message"
+        >
           <span class="message-label">Horizon</span>
           <span class="typing-dots" aria-label="Horizon réfléchit">
             <i></i><i></i><i></i>
@@ -93,7 +119,9 @@
           <span aria-hidden="true">&#8593;</span>
         </button>
       </form>
-      <p class="privacy-note">Les réponses sont générées à partir de ton journal.</p>
+      <p class="privacy-note">
+        Les réponses sont générées à partir de ton journal.
+      </p>
     </section>
   </main>
 </template>
@@ -130,6 +158,17 @@ const handleSubmit = async () => {
     await scrollToBottom();
   } catch (error) {
     question.value = value;
+    errorMessage.value =
+      error?.response?.data?.error ||
+      "Impossible de joindre l'assistant pour le moment.";
+  }
+};
+
+const handleSummary = async () => {
+  errorMessage.value = "";
+  try {
+    await chat.summarizeWeek();
+  } catch (error) {
     errorMessage.value =
       error?.response?.data?.error ||
       "Impossible de joindre l'assistant pour le moment.";
@@ -200,6 +239,34 @@ const useSuggestion = (suggestion) => {
   font-size: 12px;
 }
 
+.chat-header-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 14px;
+}
+
+.summary-button {
+  padding: 9px 13px;
+  border: 1px solid var(--color-accent);
+  border-radius: 999px;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.summary-button:hover:not(:disabled) {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.summary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .clear-button:hover {
   color: var(--color-accent);
 }
@@ -224,6 +291,10 @@ const useSuggestion = (suggestion) => {
   background: var(--color-accent-soft);
   color: var(--color-accent);
   font-size: 24px;
+}
+
+.loading-icon {
+  animation: pulse 1s infinite ease-in-out;
 }
 
 .empty-chat h2 {
@@ -411,8 +482,12 @@ const useSuggestion = (suggestion) => {
   animation: pulse 1s infinite ease-in-out;
 }
 
-.typing-dots i:nth-child(2) { animation-delay: 0.15s; }
-.typing-dots i:nth-child(3) { animation-delay: 0.3s; }
+.typing-dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.typing-dots i:nth-child(3) {
+  animation-delay: 0.3s;
+}
 
 .sr-only {
   position: absolute;
@@ -426,8 +501,15 @@ const useSuggestion = (suggestion) => {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.35; transform: translateY(0); }
-  50% { opacity: 1; transform: translateY(-2px); }
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
 }
 
 @media (max-width: 560px) {
@@ -443,6 +525,11 @@ const useSuggestion = (suggestion) => {
   .chat-header {
     flex-direction: column;
     gap: 12px;
+  }
+
+  .chat-header-actions {
+    align-items: flex-start;
+    flex-wrap: wrap;
   }
 
   .message {
