@@ -6,5 +6,7 @@ const router = Router();
 
 router.post("/ask", authMiddleware, chatController.ask);
 router.post("/weekly-summary", authMiddleware, chatController.weeklySummary)
+router.get("/conversations", authMiddleware, chatController.getConversations);
+router.get("/conversations/:conversationId/messages", authMiddleware, chatController.getMessages)
 
 export default router;

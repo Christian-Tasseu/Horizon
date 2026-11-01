@@ -1,6 +1,7 @@
 import { habitRepository } from "../repositories/habit.repository.js";
 import { habitLogRepository } from "../repositories/habitLog.repository.js";
 import { journalRepository } from "../repositories/journal.repository.js";
+import { conversationService } from "./conversation.service.js";
 import { llmService } from "./llm.service.js";
 
 const MAX_ENTRIES = 10;
@@ -107,7 +108,7 @@ Cinq phrases maximum.
 Tutoie l'utilisateur`;
     return prompt;
   },
-  async summarizeWeek({ userId }) {
+  async summarizeWeek({ userId, conversationId }) {
     const { habits, entries } = await summaryService.getWeekData(userId);
     if (habits.length === 0 && entries.length === 0)
       return {
@@ -118,6 +119,13 @@ Tutoie l'utilisateur`;
     const used = entries.slice(-MAX_ENTRIES);
     const prompt = summaryService.buildPrompt(habits, used);
     const answer = await llmService.generate(prompt);
-    return { answer, sources: used };
+    const id = await conversationService.saveExchange({
+      userId,
+      id,
+      question: "Résumé de la semaine",
+      answer,
+      sources: used,
+    });
+    return { conversationId: id, answer, sources: used };
   },
 };

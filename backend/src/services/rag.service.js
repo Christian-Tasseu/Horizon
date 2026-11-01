@@ -1,8 +1,19 @@
-import { journalService } from "../services/journal.service.js";
-import { llmService } from "../services/llm.service.js";
+import { journalService } from "./journal.service.js";
+import { llmService } from "./llm.service.js";
+import { conversationService } from "./conversation.service.js";
+
+const SYSTEM_RULES = `Tu es un assistant qui aide l'utilisateur à relire son journal personnel.
+Réponds uniquement à partir des extraits ci-dessous.
+Si les extraits ne permettent pas de répondre, dis-le clairement.
+N'invente rien.
+Cite la date des extraits quand tu t'y réfères.
+Adresse-toi à l'utilisateur par "tu" et non par "vous".`;
+const HISTORY_LIMIT = 4;
+const HISTORY_MAX_CHARS = 500;
+const FOLLOW_UP_MAX_CHARS = 40;
 
 export const ragService = {
-  buildPrompt(question, entries) {
+  buildUserMessage(question, entries) {
     const newEntries = entries
       .map(
         (entry) =>
@@ -11,26 +22,73 @@ export const ragService = {
           })}] ${entry.content}`,
       )
       .join("\n");
-    return `Tu es un assistant qui aide l'utilisateur à relire son journal personnel.
-Réponds uniquement à partir des extraits ci-dessous. Si les extraits ne
-permettent pas de répondre, dis-le clairement. N'invente rien. cite la date des extraits quand tu t'y réfères. Adresse-toi à l'utilisateur par "tu" et non par "vous".
 
-Extraits du journal :
+    return `Extraits du journal :
 ${newEntries}
 
-Question : ${question}`;
+Question : ${question}
+
+Réponds uniquement à partir des extraits ci-dessus, sans poser de question.`;
   },
 
-  async answer({ userId, question }) {
-    const entries = await journalService.search({ userId, query: question });
+  async answer({ userId, conversationId, question }) {
+    const history = await conversationService.getHistory({
+      userId,
+      conversationId,
+    });
+    const limitedHistory = history.slice(-HISTORY_LIMIT).map((message) => ({
+      ...message,
+      content: message.content.slice(0, HISTORY_MAX_CHARS),
+    }));
+    let searchQuery = question;
+
+    const lastUserMessage = history.findLast(
+      (message) => message.role === "user",
+    );
+
+    if (question.length < FOLLOW_UP_MAX_CHARS && lastUserMessage) {
+      searchQuery = lastUserMessage.content + "\n" + question;
+    }
+    const entries = await journalService.search({
+      userId,
+      query: searchQuery,
+    });
     if (entries.length === 0) {
+      const answer =
+        "Je ne trouve rien dans ton journal qui réponde à cette question.";
+
+      const savedConversation = await conversationService.saveExchange({
+        userId,
+        conversationId,
+        question,
+        answer,
+      });
+
       return {
-        answer: "Je ne trouve rien dans ton journal qui réponde à cette question.",
+        conversationId: savedConversation.conversationId,
+        answer,
         sources: [],
       };
     }
-    const prompt = ragService.buildPrompt(question, entries);
-    const answer = await llmService.generate(prompt);
-    return { answer, sources: entries };
+    const messages = [
+      { role: "system", content: SYSTEM_RULES },
+      ...limitedHistory,
+      {
+        role: "user",
+        content: ragService.buildUserMessage(question, entries),
+      },
+    ];
+    const answer = await llmService.chat(messages);
+    const savedConversation = await conversationService.saveExchange({
+      userId,
+      conversationId,
+      question,
+      answer,
+    });
+    return {
+      conversationId: savedConversation.conversationId,
+      answer,
+      sources: entries,
+    };
   },
 };
