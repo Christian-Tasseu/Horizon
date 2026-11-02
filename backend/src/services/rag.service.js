@@ -35,6 +35,7 @@ Réponds uniquement à partir des extraits ci-dessus, sans poser de question.`;
     const history = await conversationService.getHistory({
       userId,
       conversationId,
+      limit: HISTORY_LIMIT,
     });
     const limitedHistory = history.slice(-HISTORY_LIMIT).map((message) => ({
       ...message,
@@ -84,6 +85,7 @@ Réponds uniquement à partir des extraits ci-dessus, sans poser de question.`;
       conversationId,
       question,
       answer,
+      sources: entries,
     });
     return {
       conversationId: savedConversation.conversationId,

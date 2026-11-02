@@ -47,6 +47,10 @@ export const conversationService = {
     });
     return conversations;
   },
+  async remove({ userId, conversationId }) {
+    await assertOwned({ userId, conversationId })
+    await chatRepository.deleteConversation({ id: conversationId })
+  },
   async getMessages({ userId, conversationId }) {
     await assertOwned({ userId, conversationId });
     return await chatRepository.findMessages({ conversationId });

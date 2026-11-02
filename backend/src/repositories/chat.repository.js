@@ -22,6 +22,9 @@ export const chatRepository = {
     );
     return conversations;
   },
+  async deleteConversation({ id }) {
+    await db.query("DELETE FROM conversations WHERE id = ?", [id])
+  },
   async addMessage({ conversationId, role, content, sources }) {
     await db.query(
       "INSERT INTO messages (conversation_id, role, content, sources) VALUES (?, ?, ?, ?)",

@@ -1,6 +1,51 @@
 <template>
   <main class="chat-page">
-    <section class="chat-shell" aria-labelledby="chat-title">
+    <div class="chat-layout">
+      <aside class="conversations" aria-label="Conversations">
+        <button
+          type="button"
+          class="new-conversation"
+          :disabled="chat.isLoading"
+          @click="handleNew"
+        >
+          + Nouvelle conversation
+        </button>
+        <ul>
+          <li v-for="conversation in chat.conversations" :key="conversation.id">
+            <button
+              type="button"
+              class="conversation-button"
+              :class="{
+                active: conversation.id === chat.currentConversationId,
+              }"
+              :disabled="chat.isLoading"
+              @click="handleOpen(conversation.id)"
+            >
+              {{ conversation.title }}
+            </button>
+            <button
+              type="button"
+              class="delete-conversation"
+              :disabled="chat.isLoading"
+              :aria-label="`Supprimer ${conversation.title}`"
+              @click.stop="handleDelete(conversation.id)"
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                focusable="false"
+              >
+                <path d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7V4h6v3" />
+              </svg>
+            </button>
+          </li>
+        </ul>
+        <p v-if="!chat.conversations.length" class="no-conversations">
+          Aucune conversation pour l'instant.
+        </p>
+      </aside>
+
+      <section class="chat-shell" aria-labelledby="chat-title">
       <header class="chat-header">
         <div>
           <p class="eyebrow">Ton journal, autrement</p>
@@ -23,7 +68,7 @@
             v-if="chat.messages.length"
             class="clear-button"
             type="button"
-            @click="chat.clear"
+            @click="handleNew"
           >
             Nouvelle conversation
           </button>
@@ -122,12 +167,13 @@
       <p class="privacy-note">
         Les réponses sont générées à partir de ton journal.
       </p>
-    </section>
+      </section>
+    </div>
   </main>
 </template>
 
 <script setup>
-import { nextTick, ref } from "vue";
+import { nextTick, onMounted, ref } from "vue";
 import { useChatStore } from "../stores/chat.store.js";
 
 const chat = useChatStore();
@@ -179,12 +225,169 @@ const useSuggestion = (suggestion) => {
   question.value = suggestion;
   handleSubmit();
 };
+
+const handleOpen = async (id) => {
+  errorMessage.value = "";
+  try {
+    await chat.openConversation(id);
+  } catch (error) {
+    errorMessage.value =
+      error?.response?.data?.error ||
+      "Impossible d'ouvrir cette conversation pour le moment.";
+  }
+};
+
+const handleDelete = async (id) => {
+  const conversation = chat.conversations.find(
+    (item) => item.id === id,
+  );
+  const confirmed = window.confirm(
+    `Supprimer la conversation « ${conversation?.title || "sans titre"} » ?`,
+  );
+  if (!confirmed) return;
+
+  errorMessage.value = "";
+  try {
+    await chat.deleteConversation(id);
+  } catch (error) {
+    errorMessage.value =
+      error?.response?.data?.error ||
+      "Impossible de supprimer cette conversation pour le moment.";
+  }
+};
+
+const handleNew = async () => {
+  errorMessage.value = "";
+  await chat.newConversation();
+};
+
+onMounted(async () => {
+  try {
+    await chat.fetchConversations();
+  } catch (error) {
+    errorMessage.value =
+      error?.response?.data?.error ||
+      "Impossible de charger les conversations pour le moment.";
+  }
+});
 </script>
 
 <style scoped>
 .chat-page {
   min-height: calc(100vh - 72px);
   padding: 48px 24px 64px;
+}
+
+.chat-layout {
+  width: min(1120px, 100%);
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 20px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.conversations {
+  padding: 18px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  background: var(--color-surface);
+  box-shadow: 0 18px 45px rgba(27, 36, 48, 0.06);
+}
+
+.new-conversation {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-accent);
+  border-radius: 10px;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.new-conversation:hover:not(:disabled) {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.new-conversation:disabled,
+.conversations li button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.conversations ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.conversations li {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.conversations li button {
+  overflow: hidden;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  font-size: 12px;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conversation-button {
+  flex: 1;
+  min-width: 0;
+}
+
+.conversation-button:hover:not(:disabled),
+.conversation-button.active {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.delete-conversation {
+  flex: 0 0 28px;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  padding: 6px !important;
+  place-items: center;
+  color: var(--color-danger) !important;
+  text-align: center !important;
+}
+
+.delete-conversation svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.delete-conversation:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+}
+
+.no-conversations {
+  margin: 18px 4px 4px;
+  color: var(--color-ink-soft);
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .chat-shell {
@@ -517,7 +720,16 @@ const useSuggestion = (suggestion) => {
     padding: 24px 12px;
   }
 
+  .chat-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .conversations {
+    order: 2;
+  }
+
   .chat-shell {
+    order: 1;
     min-height: calc(100vh - 112px);
     padding: 22px 16px;
   }

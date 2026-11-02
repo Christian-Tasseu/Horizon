@@ -14,7 +14,7 @@ export const chatController = {
         error: "La question ne doit pas dépasser 1000 caractères.",
       });
     }
-    if (conversationId !== undefined && !Number.isInteger(conversationId)) {
+    if (conversationId !== null && !Number.isInteger(conversationId)) {
       return res.status(400).json({
         error: "conversationId doit être un entier.",
       });
@@ -36,11 +36,11 @@ export const chatController = {
     const userId = req.userId;
     const { conversationId } = req.body;
     try {
-      const result = await summaryService.summarizeWeek({
+      const { id, answer, sources} = await summaryService.summarizeWeek({
         userId,
         conversationId,
       });
-      res.status(200).json({ result });
+      res.status(200).json({ conversationId: id, answer, sources });
     } catch (error) {
       res.status(error.status || 500).json({
         error: "Une erreur est survenue lors du traitement de la requête.",
@@ -58,13 +58,31 @@ export const chatController = {
       });
     }
   },
+  async deleteConversation( req, res ){
+    const userId = req.userId
+    const { conversationId } = req.params
+    const id = Number(conversationId);
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({
+        error: "conversationId doit être un entier.",
+      });
+    }
+    try {
+      await conversationService.remove({ userId, conversationId: id })
+      res.status(204).send()
+    } catch (error) {
+      res.status(error.status || 500).json({
+        error: error.message,
+      });
+    }
+  },
   async getMessages(req, res) {
     const userId = req.userId;
     const { conversationId } = req.params;
     try {
       const messages = await conversationService.getMessages({
         userId,
-        conversationId: Number(id),
+        conversationId: Number(conversationId),
       });
       res.status(200).json({ messages });
     } catch (error) {

@@ -119,13 +119,13 @@ Tutoie l'utilisateur`;
     const used = entries.slice(-MAX_ENTRIES);
     const prompt = summaryService.buildPrompt(habits, used);
     const answer = await llmService.generate(prompt);
-    const id = await conversationService.saveExchange({
+    const { conversationId: id } = await conversationService.saveExchange({
       userId,
-      id,
+      conversationId,
       question: "Résumé de la semaine",
       answer,
       sources: used,
     });
-    return { conversationId: id, answer, sources: used };
+    return { id, answer, sources: used };
   },
 };
